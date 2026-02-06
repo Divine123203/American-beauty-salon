@@ -2,6 +2,23 @@
 import React from 'react';
 
 const Booking: React.FC = () => {
+  // Logic for dynamic calendar (NY Timezone)
+  const nyDate = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+  const currentMonth = nyDate.getMonth();
+  const currentYear = nyDate.getFullYear();
+  const today = nyDate.getDate();
+
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  // Get starting day of the month (0=Sunday, 1=Monday, etc.)
+  const firstDayRaw = new Date(currentYear, currentMonth, 1).getDay();
+  // Map to Mon-Sun (Mon=0, Tue=1... Sun=6)
+  const emptySlots = (firstDayRaw + 6) % 7;
+
   return (
     <section id="booking" className="py-24 bg-white">
       <div className="container mx-auto px-6">
@@ -23,17 +40,21 @@ const Booking: React.FC = () => {
 
             {/* Calendar and Hours */}
             <div className="w-full md:w-1/2 flex flex-col gap-8">
-              {/* Minimalist Calendar */}
+              {/* Dynamic Calendar */}
               <div className="luxury-card p-6">
                 <div className="text-center mb-6">
-                  <p className="text-sm font-bold text-[#1A1A1A]">January 2024</p>
+                  <p className="text-sm font-bold text-[#1A1A1A]">{monthNames[currentMonth]} {currentYear}</p>
                 </div>
                 <div className="grid grid-cols-7 gap-2 text-center text-[10px] text-gray-400 font-bold mb-4">
                   {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(d => <div key={d}>{d}</div>)}
                 </div>
                 <div className="grid grid-cols-7 gap-1 text-center">
-                  {Array.from({ length: 31 }).map((_, i) => (
-                    <div key={i} className={`text-xs py-2 rounded-lg cursor-pointer transition-colors ${i + 1 === 24 ? 'bg-[#A31D1D] text-white font-bold' : 'hover:bg-[#F5EFEB] text-[#1A1A1A]'}`}>
+                  {/* Empty slots for month alignment */}
+                  {Array.from({ length: emptySlots }).map((_, i) => (
+                    <div key={`empty-${i}`} className="text-xs py-2"></div>
+                  ))}
+                  {Array.from({ length: daysInMonth }).map((_, i) => (
+                    <div key={i} className={`text-xs py-2 rounded-lg cursor-pointer transition-colors ${i + 1 === today ? 'bg-[#A31D1D] text-white font-bold' : 'hover:bg-[#F5EFEB] text-[#1A1A1A]'}`}>
                       {i + 1}
                     </div>
                   ))}
